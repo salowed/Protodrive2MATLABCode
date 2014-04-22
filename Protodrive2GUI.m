@@ -83,16 +83,17 @@ TIMEOUT = 5;    %time to wait for data before aborting
 n=0;
 i=1;
 set(handles.startButton,'UserData',0);
-%set(handles.EditSpeed, 'UserData',0.6);
 
-try
-    
+try 
     %create serial object to represent connection to mbed
     mbed = serial('/dev/tty.usbmodem1422');       %change depending on mbed configuration
     set(mbed,'Timeout',TIMEOUT);        %adjust timeout to ensure fast response when mbed disconnected
     
     fopen(mbed);        %open serial connection
     
+    contents = cellstr(get(handles.DriveCycleSelector,'String')); %returns DriveCycleSelector contents as cell array
+    fprintf(mbed, strcat(contents{get(handles.DriveCycleSelector,'Value')},'\n'));
+    disp(contents{get(handles.DriveCycleSelector,'Value')});
     
     while(n < 10000)
         t(i) = fscanf(mbed, '%f');
@@ -106,15 +107,12 @@ try
         xlabel(handles.currentAxes,'Time (s/10)');
         ylabel(handles.currentAxes,'Current (Amps)');
         n = n+1;
-        %pause(0.1);       
-        %fprintf(mbed, '%fn', get(handles.EditSpeed,'UserData'));
-        disp(get(handles.EditSpeed,'UserData'));
         %drawnow; %force event queue update
         if get(handles.startButton,'UserData')
             break;
         end
     end
-    
+   
     fclose(mbed);   %close connection (this should never be reached when using while(1), but included for completeness)
     
 catch exception
