@@ -22,7 +22,7 @@ function varargout = Protodrive2GUI(varargin)
 
 % Edit the above text to modify the response to help Protodrive2GUI
 
-% Last Modified by GUIDE v2.5 17-Apr-2014 15:04:26
+% Last Modified by GUIDE v2.5 25-Apr-2014 15:27:34
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -95,17 +95,52 @@ try
     fprintf(mbed, strcat(contents{get(handles.DriveCycleSelector,'Value')},'\n'));
     disp(contents{get(handles.DriveCycleSelector,'Value')});
     
-    while(n < 10000)
-        t(i) = fscanf(mbed, '%f');
-        disp(t(i));
-        i=i+1;
+    while(n < 1000)
+        t = fscanf(mbed, '%f %f %f %f %f');
+        elevation(i) = t(1);
+        batteryVoltage(i) = t(2);
+        capVoltage(i) = t(3);
+        batteryCurrent(i) = t(4);
+        capCurrent(i) = t(5);
+        
+        disp(elevation(i));
+        disp(batteryVoltage(i));
+        disp(capVoltage(i));
+        disp(batteryCurrent(i));
+        disp(capCurrent(i));
+        
+        x(i) = i;
+        
         
         set(gcf,'color','white');
         drawnow;
-        plot(handles.currentAxes,t,'-.dk','linewidth',1.8)
-        title(handles.currentAxes,'Current vs. time');
-        xlabel(handles.currentAxes,'Time (s/10)');
-        ylabel(handles.currentAxes,'Current (Amps)');
+        plot(handles.elevationAxis,elevation, '-.dk','linewidth',1.8)
+        title(handles.elevationAxis,'Elevation vs. time');
+        xlabel(handles.elevationAxis,'Time');
+        ylabel(handles.elevationAxis,'Elevation (Units)');
+        set(handles.elevationReading,'String',strcat(num2str(elevation(i)), ' Units'));
+        
+        plot(handles.batteryVoltageAxis,batteryVoltage,'-.dk','linewidth',1.8)
+        title(handles.batteryVoltageAxis,'Battery Voltage vs. time');
+        xlabel(handles.batteryVoltageAxis,'Time');
+        ylabel(handles.batteryVoltageAxis,'Voltage (V)');
+        set(handles.batteryVoltageReading,'String',strcat(num2str(batteryVoltage(i)), ' V'));
+        
+        plot(handles.capVoltageAxis,capVoltage,'-.dk','linewidth',1.8)
+        title(handles.capVoltageAxis,'Cap Voltage vs. time');
+        xlabel(handles.capVoltageAxis,'Time');
+        ylabel(handles.capVoltageAxis,'Voltage (V)');
+        set(handles.capVoltageReading,'String',strcat(num2str(capVoltage(i)), ' V'));
+        
+        
+        
+        plot(handles.currentAxis,x,batteryCurrent,x,capCurrent,'-.dk','linewidth',1.8)
+        title(handles.currentAxis,'Current vs. time');
+        xlabel(handles.currentAxis,'Time');
+        ylabel(handles.currentAxis,'Current (Amps)');
+        set(handles.currentReading,'String',strcat(num2str(batteryCurrent(i)), ' V'));
+    
+        i=i+1;
         n = n+1;
         %drawnow; %force event queue update
         if get(handles.startButton,'UserData')
